@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script type="text/javascript" src="script.js"></script>
+    <link rel="stylesheet" href="styleLevel.css"></script>
+
+    <title>Évasion télépathique</title>
+</head>
+<body>
+    <main x-data="app()" x-init="init()">
+
+        <!-- INTERFACE -->
+        <section>
+
+            
+        </section>
+
+        <!-- Calque visible -->
+        <section>
+        </section>
+
+
+        <!-- SPY -->
+        <section>
+
+            <div>
+                <h2>SPY board</h2>
+                <button @click="displayCalque('Exit')">Sortie</button>
+                <button @click="displayCalque('Bordures')">Bordures</button>
+                <button @click="displayCalque('Mines')">Mines</button>
+                <button @click="displayCalque('Camera')">Caméra</button>
+                <button @click="displayCalque('Laser')">Laser</button>
+            </div>
+
+            <p x-text="calqueVisible ? 'Calque visible : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p>
+            <p x-text="calqueActif ? 'Calque désactivé : ' + calquesText[calqueActif] + ' - ' + calquesExplanationActive[calqueActif] : 'Aucun calque désactivé pour le moment'"></p>
+
+            <div id="screenCalqueVisible" class="grid"></div>
+            <div x-show="calqueVisible === 'Laser'" x-text="'Nombre de cycles avant prochain déplacement vers le bord opposé au laser : ' + nbCycleBeforeMoveLaser"></div>
+        </section>
+
+
+        <!-- PRISONNER  -->
+        <section>
+
+        </section>
+
+    </main>
+</body>
+</html>

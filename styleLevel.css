@@ -1,0 +1,79 @@
+.grid {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: 10px;
+}
+
+.row {
+    display: flex;
+}
+
+.cell {
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-cell {
+    font-weight: bold;
+    background-color: lightgray;
+}
+
+.border {
+    width: 20px;
+    height: 50px;
+}
+
+.tile {
+    width: 50px;
+    height: 50px;
+}
+
+.borderRow {
+    width: 50px;
+    height: 20px;
+}
+
+.intersectionRow {
+    width: 20px;
+    height: 20px;
+}
+
+/*
+
+/* Élément vide */
+.cell-0 {
+    background-color: white;
+}
+/* Entrée du niveau */
+.cell-1 {
+    background-color: cyan;
+}
+/* Sortie du niveau */
+.cell-2 {
+    background-color: green;
+}
+/* Bordures */
+.cell-3 {
+    background-color: black;
+}
+/* Position du laser */
+.cell-4 {
+    background-color: red;
+}
+/* Mines */
+.cell-5 {
+    background-color: blue;
+}
+/* Port de piratage caméra */
+.cell-6 {
+    background-color: yellow;
+}
+/* Champ de vision caméra */
+.cell-7 {
+    background-color: orange;
+}
