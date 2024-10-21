@@ -62,6 +62,17 @@
                 <button @click="player(moves[3])">&rarr;</button>
                 <button @click="player(moves[1])">&darr;</button>
 
+                <button @click="act(actions[0]) ; reduce('nbDisjoncteur')" x-text="'Disjoncteur LASER * ' + nbDisjoncteur" :disabled="nbDisjoncteur === 0"></button>
+                <button @click="act(actions[5]) ; reduce('nbPiratage')" x-text="'Piratage des caméras * ' + nbPiratage" :disabled="nbPiratage === 0"></button>
+
+                <br><br><fieldset>
+                    <legend x-text="'Déminage directionnel * ' + nbDeminage"></legend>
+                    <button @click="act(actions[0]) ; reduce('nbDeminage')" :disabled="nbDeminage === 0">&uarr;</button>
+                    <button @click="act(actions[2]) ; reduce('nbDeminage')" :disabled="nbDeminage === 0">&larr;</button>
+                    <button @click="act(actions[3]) ; reduce('nbDeminage')" :disabled="nbDeminage === 0">&rarr;</button>
+                    <button @click="act(actions[1]) ; reduce('nbDeminage')" :disabled="nbDeminage === 0">&darr;</button>
+                </fieldset>
+
                 <br><br><div class="gridPrisonner"></div>
 
                 <br><button @click="giveHand('SPY')">PASSER LA MAIN</button>

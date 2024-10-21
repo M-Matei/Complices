@@ -131,6 +131,10 @@ const app = () => {
     moves : ['TOP', 'BOTTOM', 'LEFT', 'RIGHT'],
     actions : ['Disjoncter', 'TopDeminage', 'BottomDeminage', 'LeftDeminage', 'RightDeminage', 'Pirater'],
 
+    nbDisjoncteur : 1,
+    nbPiratage : 1,
+    nbDeminage : 2,
+
     playerPosition : [
         [0, 0, 0, 0, 0, 0, 0, 0, 0], // Ligne : Bordures
         [0, 7, 0, 0, 0, 0, 0, 0, 0], // Ligne : Case
@@ -260,6 +264,24 @@ const app = () => {
           }
           break;
       }
+    },
+
+    reduce(compteur){
+      switch(compteur){
+        case 'nbPiratage':
+          this.nbPiratage-- ;
+          break;
+        case 'nbDeminage':
+          this.nbDeminage-- ;
+          break;
+        case 'nbDisjoncteur':
+          this.nbDisjoncteur-- ;
+          break;
+      }
+    },
+
+    act(what){
+      //
     },
 
     displayGrid(calque){
