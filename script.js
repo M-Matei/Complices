@@ -131,6 +131,8 @@ const app = () => {
     moves : ['TOP', 'BOTTOM', 'LEFT', 'RIGHT'],
     actions : ['Disjoncter', 'TopDeminage', 'BottomDeminage', 'LeftDeminage', 'RightDeminage', 'Pirater'],
 
+    laserActuel : 0,
+
     nbDisjoncteur : 1,
     nbPiratage : 1,
     nbDeminage : 2,
@@ -167,6 +169,17 @@ const app = () => {
       }
       this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
       this.nbCycle++ ;
+      this.nbCycleBeforeMoveLaser--;
+
+      if (this.nbCycleBeforeMoveLaser === 0){
+        this.moveLaser();
+        let coordsPlayer = this.playerPos();
+
+        if (coordsPlayer[0]+1 === this.laserActuel) {
+          alert('Vous avez été rattrapé et grillé par le fil laser !');
+          this.nbTry++ ;
+        }
+      }
     },
 
     playerPos(){
@@ -284,6 +297,39 @@ const app = () => {
       //
     },
 
+    moveLaser(){
+      // Vérifier si la ligne à décaler est valide
+      if (this.laserActuel < 0 || this.laserActuel >= this.calquesGameDesign['Laser'].length) {
+        console.log("Ligne invalide.");
+        return;
+      }
+
+      // Calculer la nouvelle position de la ligne après le décalage
+      let nouvelleLigne = this.laserActuel + 2 ;
+
+      // Si la nouvelle position dépasse la dernière ligne, on la borne à la dernière ligne
+      if (nouvelleLigne >= this.calquesGameDesign['Laser'].length) {
+        nouvelleLigne = this.calquesGameDesign['Laser'].length - 1;
+      }
+
+      // Si la nouvelle position est avant la première ligne, on la borne à 0
+      if (nouvelleLigne < 0) {
+        nouvelleLigne = 0;
+      }
+
+      // Extraire la ligne à décaler
+      const ligneDecalee = this.calquesGameDesign['Laser'][this.laserActuel].slice();
+
+      // Remplacer l'ancienne ligne par une ligne vide
+      this.calquesGameDesign['Laser'][this.laserActuel] = new Array(this.calquesGameDesign['Laser'][0].length).fill(0);
+
+      // Placer la ligne décalée à la nouvelle position
+      this.calquesGameDesign['Laser'][nouvelleLigne] = ligneDecalee;
+
+      this.nbCycleBeforeMoveLaser = 4 ;
+      this.laserActuel += 2 ;
+    },
+
     displayGrid(calque){
       const gridElement = document.querySelector('.gridPrisonner');
       
@@ -369,7 +415,11 @@ const app = () => {
         if (this.calqueVisible !== null) {
           this.calqueActif = this.calqueVisible ;
           this.nbCycle++ ;
-          // this.nbCycleBeforeMoveLaser--  ;
+          this.nbCycleBeforeMoveLaser-- ;
+
+          if (this.nbCycleBeforeMoveLaser === 0){
+            this.moveLaser();
+          }
         }
 
         this.calqueVisible = calque ;
