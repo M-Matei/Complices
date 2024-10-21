@@ -27,7 +27,6 @@
 
         <!-- SPY -->
         <section>
-
             <div>
                 <h2>SPY board</h2>
                 <button @click="displayCalque('Exit')">Sortie</button>
@@ -47,6 +46,16 @@
 
         <!-- PRISONNER  -->
         <section>
+            <div>
+                <h2>PRISONNER board</h2>
+
+                <button @click="player(moves[0])">&uarr;</button>
+                <button @click="player(moves[2])">&larr;</button>
+                <button @click="player(moves[3])">&rarr;</button>
+                <button @click="player(moves[1])">&darr;</button>
+
+                <br><br><div class="gridPrisonner"></div>
+            </div>
 
         </section>
 

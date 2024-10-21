@@ -49,31 +49,31 @@
 .cell-0 {
     background-color: white;
 }
-/* Entrée du niveau */
-.cell-1 {
-    background-color: cyan;
-}
 /* Sortie du niveau */
-.cell-2 {
-    background-color: green;
+.cell-1 {
+    background-color: greenyellow;
 }
 /* Bordures */
-.cell-3 {
+.cell-2 {
     background-color: black;
 }
 /* Position du laser */
-.cell-4 {
+.cell-3 {
     background-color: red;
 }
 /* Mines */
-.cell-5 {
+.cell-4 {
     background-color: blue;
 }
 /* Port de piratage caméra */
-.cell-6 {
+.cell-5 {
     background-color: yellow;
 }
 /* Champ de vision caméra */
-.cell-7 {
+.cell-6 {
     background-color: orange;
+}
+/* Position du joueur */
+.cell-7 {
+    background-color: cyan;
 }
