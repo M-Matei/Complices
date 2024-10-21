@@ -145,8 +145,8 @@ const app = () => {
 
     init(){
 
-        this.nbCycle = 0 ;
-        this.nbTry = 0 ;
+        this.nbCycle = 1 ;
+        this.nbTry = 1 ;
         this.joueurActif = this.roles[0];
         this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
 
@@ -209,30 +209,54 @@ const app = () => {
       switch(move){
         case 'TOP':
           if (coords[0] > 2) {
-            this.updateGrid(coords[0]-2, coords[1]);
+            if (this.calqueActif !== 'Bordures' && this.calquesGameDesign['Bordures'][coords[0]-1][coords[1]]) {
+              alert('Game over, vous avez touché une bordure intérieure');
+              this.nbTry++;
+            } else {
+              this.updateGrid(coords[0]-2, coords[1]);
+            }
           } else {
             alert('Game over, vous avez touché une bordure extérieure');
+            this.nbTry++;
           }
           break;
         case 'LEFT':
           if (coords[1] > 2) {
-            this.updateGrid(coords[0], coords[1]-2);
+            if (this.calqueActif !== 'Bordures' && this.calquesGameDesign['Bordures'][coords[0]][coords[1]-1]) {
+              alert('Game over, vous avez touché une bordure intérieure');
+              this.nbTry++;
+            } else {
+              this.updateGrid(coords[0], coords[1]-2);
+            }
           } else {
             alert('Game over, vous avez touché une bordure extérieure');
+            this.nbTry++;
           }
           break;
         case 'RIGHT':
           if (coords[1] < nbColumn-2) {
-            this.updateGrid(coords[0], coords[1]+2);
+            if (this.calqueActif !== 'Bordures' && this.calquesGameDesign['Bordures'][coords[0]][coords[1]+1]) {
+              alert('Game over, vous avez touché une bordure intérieure');
+              this.nbTry++;
+            } else {
+              this.updateGrid(coords[0], coords[1]+2);
+            }
           } else {
             alert('Game over, vous avez touché une bordure extérieure');
+            this.nbTry++;
           }
           break;
         case 'BOTTOM':
           if (coords[0] < nbRow-2) {
-            this.updateGrid(coords[0]+2, coords[1]);
+            if (this.calqueActif !== 'Bordures' && this.calquesGameDesign['Bordures'][coords[0]+1][coords[1]]) {
+              alert('Game over, vous avez touché une bordure intérieure');
+              this.nbTry++;
+            } else {
+              this.updateGrid(coords[0]+2, coords[1]);
+            }
           } else {
             alert('Game over, vous avez touché une bordure extérieure');
+            this.nbTry++;
           }
           break;
       }

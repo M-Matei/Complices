@@ -21,6 +21,10 @@
                 <p x-text="'Cycle n°' + nbCycle"></p>
                 <p x-text="'Essai n°'+ nbTry"></p>
                 <p x-text="'Joueur actif : ' + joueurActif"></p>
+
+                <b><p x-text="calqueVisible ? 'Calque visible : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p></b>
+                <b><p x-text="calqueActif ? 'Calque désactivé : ' + calquesText[calqueActif] + ' - ' + calquesExplanationActive[calqueActif] : 'Aucun calque désactivé pour le moment'"></p></b>
+    
             </fieldset>
         </section>
 
@@ -39,9 +43,6 @@
                 <button @click="displayCalque('Camera')">Caméra</button>
                 <button @click="displayCalque('Laser')">Laser</button>
             </div>
-
-            <p x-text="calqueVisible ? 'Calque visible : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p>
-            <p x-text="calqueActif ? 'Calque désactivé : ' + calquesText[calqueActif] + ' - ' + calquesExplanationActive[calqueActif] : 'Aucun calque désactivé pour le moment'"></p>
 
             <div id="screenCalqueVisible" class="grid"></div>
             <div x-show="calqueVisible === 'Laser'" x-text="'Nombre de cycles avant prochain déplacement vers le bord opposé au laser : ' + nbCycleBeforeMoveLaser"></div>
