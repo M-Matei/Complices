@@ -16,8 +16,12 @@
 
         <!-- INTERFACE -->
         <section>
-
-            
+            <fieldset>
+                <legend><b>Common UI</b></legend>
+                <p x-text="'Cycle n°' + nbCycle"></p>
+                <p x-text="'Essai n°'+ nbTry"></p>
+                <p x-text="'Joueur actif : ' + joueurActif"></p>
+            </fieldset>
         </section>
 
         <!-- Calque visible -->
@@ -26,7 +30,7 @@
 
 
         <!-- SPY -->
-        <section>
+        <section x-show="spyBoard">
             <div>
                 <h2>SPY board</h2>
                 <button @click="displayCalque('Exit')">Sortie</button>
@@ -41,11 +45,14 @@
 
             <div id="screenCalqueVisible" class="grid"></div>
             <div x-show="calqueVisible === 'Laser'" x-text="'Nombre de cycles avant prochain déplacement vers le bord opposé au laser : ' + nbCycleBeforeMoveLaser"></div>
+
+            <button @click="giveHand('PRISONNER')">PASSER LA MAIN</button>
+
         </section>
 
 
         <!-- PRISONNER  -->
-        <section>
+        <section x-show="!spyBoard">
             <div>
                 <h2>PRISONNER board</h2>
 
@@ -55,6 +62,8 @@
                 <button @click="player(moves[1])">&darr;</button>
 
                 <br><br><div class="gridPrisonner"></div>
+
+                <br><button @click="giveHand('SPY')">PASSER LA MAIN</button>
             </div>
 
         </section>

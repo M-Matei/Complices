@@ -108,8 +108,8 @@ const app = () => {
     nbCycle : null,
     nbTry : null,
     joueurActif : null,
-    giveHand : null,
     roles : ['SPY', 'PRISONNER'],
+    spyBoard : false,
 
     modalRules : false,
     modalHistory : false,
@@ -148,10 +148,21 @@ const app = () => {
         this.nbCycle = 0 ;
         this.nbTry = 0 ;
         this.joueurActif = this.roles[0];
+        this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
 
         this.nbCycleBeforeMoveLaser = 4 ;
 
         this.displayGrid(this.playerPosition);
+    },
+
+    giveHand(whom){
+      if (whom === this.roles[0]) {
+        this.joueurActif = this.roles[0];
+      } else {
+        this.joueurActif = this.roles[1];
+      }
+      this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
+      this.nbCycle++ ;
     },
 
     playerPos(){
