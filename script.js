@@ -37,7 +37,7 @@ const app = () => {
 
     calquesExplanationActive : {
       "Exit" : "La bordure qui permet au prisonnier de s'échapper est traversable.",
-      "Bordures" : "Les bordures du niveau sont traversables.",
+      "Bordures" : "ATTENTION ! Les bordures du niveau sont JAMAIS traversables. ATTENTION !",
       "Mines" : "Les mines ne se déclenchent pas lorsque le joueur entre dans une case qui en contient.",
       "Camera" : "La caméra ne fonctionne plus, entrer dans son champ de vision n'a pas d'effet.",
       "Laser" : "Le nombre de cycle du laser est bloqué et le laser éteint tant que le calque désactivé ne change pas."
@@ -226,7 +226,7 @@ const app = () => {
       switch(move){
         case 'TOP':
           if (coords[0] > 2) {
-            if (this.calqueActif !== 'Bordures' && this.calquesGameDesign['Bordures'][coords[0]-1][coords[1]]) {
+            if (this.calquesGameDesign['Bordures'][coords[0]-1][coords[1]]) {
               alert('Game over, vous avez touché une bordure intérieure');
               this.nbTry++;
             } else {
@@ -239,7 +239,7 @@ const app = () => {
           break;
         case 'LEFT':
           if (coords[1] > 2) {
-            if (this.calqueActif !== 'Bordures' && this.calquesGameDesign['Bordures'][coords[0]][coords[1]-1]) {
+            if (this.calquesGameDesign['Bordures'][coords[0]][coords[1]-1]) {
               alert('Game over, vous avez touché une bordure intérieure');
               this.nbTry++;
             } else {
@@ -252,7 +252,7 @@ const app = () => {
           break;
         case 'RIGHT':
           if (coords[1] < nbColumn-2) {
-            if (this.calqueActif !== 'Bordures' && this.calquesGameDesign['Bordures'][coords[0]][coords[1]+1]) {
+            if (this.calquesGameDesign['Bordures'][coords[0]][coords[1]+1]) {
               alert('Game over, vous avez touché une bordure intérieure');
               this.nbTry++;
             } else {
@@ -265,7 +265,7 @@ const app = () => {
           break;
         case 'BOTTOM':
           if (coords[0] < nbRow-2) {
-            if (this.calqueActif !== 'Bordures' && this.calquesGameDesign['Bordures'][coords[0]+1][coords[1]]) {
+            if (this.calquesGameDesign['Bordures'][coords[0]+1][coords[1]]) {
               alert('Game over, vous avez touché une bordure intérieure');
               this.nbTry++;
             } else {
