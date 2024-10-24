@@ -12,7 +12,7 @@
     <title>Évasion télépathique</title>
 </head>
 <body>
-    <main x-data="app()" x-init="init()">
+    <main x-data="app()" x-init="">
 
         <!-- INTERFACE -->
         <section>
@@ -37,11 +37,16 @@
         <section x-show="spyBoard">
             <div>
                 <h2>SPY board</h2>
-                <button @click="displayCalque('Exit')">Sortie</button>
-                <button @click="displayCalque('Bordures')">Bordures</button>
-                <button @click="displayCalque('Mines')">Mines</button>
-                <button @click="displayCalque('Camera')">Caméra</button>
-                <button @click="displayCalque('Laser')">Laser</button>
+
+                <button @click="explore() ; isDisabled = true" :disabled="isDisabled">Aperçu de tous les calques</button>
+
+                <div>
+                    <button @click="displayGrid('SPY','Exit','.grid',true)">Sortie</button>
+                    <button @click="displayGrid('SPY','Bordures','.grid',true)">Bordures</button>
+                    <button @click="displayGrid('SPY','Mines','.grid',true)">Mines</button>
+                    <button @click="displayGrid('SPY','Camera','.grid',true)">Caméra</button>
+                    <button @click="displayGrid('SPY','Laser','.grid',true)">Laser</button>
+                </div>
             </div>
 
             <div id="screenCalqueVisible" class="grid"></div>

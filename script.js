@@ -102,7 +102,7 @@ const app = () => {
   
 
     // Calques : propriétés
-    listCalques : ['Exit', 'Bordures', 'Mines', 'Laser', 'Camera'],
+    listCalques : ['Exit', 'Bordures', 'Mines', 'Camera', 'Laser'],
 
     // Interface COMMUNE
     nbCycle : null,
@@ -121,6 +121,9 @@ const app = () => {
     allCalques : false,
     calqueVisible : null,
     calqueActif : null,
+    isDisabled : false,
+
+    exploreAllLayers : false,
 
     nbCycleBeforeMoveLaser : null,
 
@@ -151,14 +154,23 @@ const app = () => {
 
     init(){
 
-        this.nbCycle = 1 ;
-        this.nbTry = 1 ;
-        this.joueurActif = this.roles[0];
-        this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
+      this.nbCycle = 1 ;
+      this.nbTry = 1 ;
+      this.joueurActif = this.roles[0];
+      this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
 
-        this.nbCycleBeforeMoveLaser = 4 ;
+      this.nbCycleBeforeMoveLaser = 4 ;
+    },
 
-        this.displayGrid(this.playerPosition);
+    wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
+
+    async explore(){
+      for (calque of this.listCalques){
+        this.displayGrid('SPY', calque, '.grid', false);
+        await this.wait(800);
+      }
     },
 
     giveHand(whom){
@@ -166,6 +178,7 @@ const app = () => {
         this.joueurActif = this.roles[0];
       } else {
         this.joueurActif = this.roles[1];
+        this.displayGrid('PRISONNER', this.playerPosition, '.gridPrisonner', true);
       }
       this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
       this.nbCycle++ ;
@@ -212,7 +225,7 @@ const app = () => {
       // Placer le nouveau 7 à la nouvelle position
       if (this.playerPosition[nouvelleLigne] && this.playerPosition[nouvelleLigne][nouvelleColonne] !== undefined) {
         this.playerPosition[nouvelleLigne][nouvelleColonne] = 7;
-        this.displayGrid(this.playerPosition);
+        this.displayGrid('PRISONNER', this.playerPosition, '.gridPrisonner', true);
       } else {
         console.log("Coordonnées invalides.");
       }
@@ -304,13 +317,19 @@ const app = () => {
         return;
       }
 
-      // Calculer la nouvelle position de la ligne après le décalage
-      let nouvelleLigne = this.laserActuel + 2 ;
-
-      // Si la nouvelle position dépasse la dernière ligne, on la borne à la dernière ligne
-      if (nouvelleLigne >= this.calquesGameDesign['Laser'].length) {
-        nouvelleLigne = this.calquesGameDesign['Laser'].length - 1;
+      // sens du Laser
+      let decalage ;
+      let reverse = false ;
+      if (this.laserActuel === 8 || reverse === true) {
+        if (this.laserActuel === 8) reverse === true ;
+        decalage = -2 ;
+      } else {
+        if (this.laserActuel === 0) reverse = false ;
+        decalage = 2 ;
       }
+
+      // Calculer la nouvelle position de la ligne après le décalage
+      let nouvelleLigne = this.laserActuel + decalage ;
 
       // Si la nouvelle position est avant la première ligne, on la borne à 0
       if (nouvelleLigne < 0) {
@@ -327,11 +346,23 @@ const app = () => {
       this.calquesGameDesign['Laser'][nouvelleLigne] = ligneDecalee;
 
       this.nbCycleBeforeMoveLaser = 4 ;
-      this.laserActuel += 2 ;
+      this.laserActuel += decalage ;
     },
 
-    displayGrid(calque){
-      const gridElement = document.querySelector('.gridPrisonner');
+    displayGrid(side, calque, classHTML, boolCount){
+
+      if (side === 'SPY' && boolCount === true) {
+        this.calqueActif = this.calqueVisible ;
+        this.calqueVisible = calque ;
+        this.nbCycle++ ;
+        this.nbCycleBeforeMoveLaser-- ;
+
+        if (this.nbCycleBeforeMoveLaser === 0){
+          this.moveLaser();
+        }
+      }
+
+      const gridElement = document.querySelector(classHTML);
       
       const lettres = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
       const taille = 9;
@@ -397,7 +428,13 @@ const app = () => {
             typeCase = 'tile';
           }
           
-          let idColor = this.playerPosition[i-1][j-1];
+          let idColor ;
+          if (side === 'PRISONNER'){
+            idColor = this.playerPosition[i-1][j-1];
+          } else if (side === 'SPY') {
+            idColor = this.calquesGameDesign[calque][i-1][j-1];
+          }
+
           cell.classList.add('cell', typeCase, `cell-${idColor}`);
   
 
@@ -408,101 +445,6 @@ const app = () => {
       }
     },
 
-    displayCalque(calque){
-
-      if (this.listCalques.includes(calque)) {
-
-        if (this.calqueVisible !== null) {
-          this.calqueActif = this.calqueVisible ;
-          this.nbCycle++ ;
-          this.nbCycleBeforeMoveLaser-- ;
-
-          if (this.nbCycleBeforeMoveLaser === 0){
-            this.moveLaser();
-          }
-        }
-
-        this.calqueVisible = calque ;
-
-        const gridElement = document.querySelector('.grid');
-      
-        const lettres = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
-        const taille = 9;
-      
-        // Effacer le contenu précédent (si nécessaire)
-        gridElement.innerHTML = '';
-      
-        // Créer la première ligne avec des lettres
-        const premiereLigne = document.createElement('div');
-        premiereLigne.classList.add('row');
-      
-        // Ajouter une cellule vide au début pour l'intersection vide entre chiffres et lettres
-        const emptyCell = document.createElement('div');
-        emptyCell.classList.add('cell', 'header-cell', 'border');
-        premiereLigne.appendChild(emptyCell);
-      
-        // Ajouter les lettres en abscisses
-        let typeCaseColumn = 'border';
-        lettres.forEach(lettre => {
-          const lettreCell = document.createElement('div');
-          lettreCell.classList.add('cell', 'header-cell', typeCaseColumn);
-          lettreCell.innerText = lettre;
-          premiereLigne.appendChild(lettreCell);
-
-          if (typeCaseColumn  === 'border') {
-            typeCaseColumn  = 'tile' ;
-          } else {
-            typeCaseColumn  = 'border';
-          }
-        });
-      
-        gridElement.appendChild(premiereLigne);
-      
-        // Ajouter les lignes avec chiffres en ordonnée
-        for (let i = 1; i <= taille; i++) {
-          const rowElement = document.createElement('div');
-          rowElement.classList.add('row');
-      
-          // Ajouter le chiffre de l'ordonnée dans la première colonne
-          if (i % 2 === 1) {
-            typeCaseRow = 'intersectionRow';
-          } else {
-            typeCaseRow = 'border';
-          }
-
-          const chiffreCell = document.createElement('div');
-          chiffreCell.classList.add('cell', 'header-cell', typeCaseRow);
-          chiffreCell.innerText = i;
-          rowElement.appendChild(chiffreCell);
-
-          // Ajouter les cellules vides (ou avec contenu si besoin)
-          for (let j = 1; j <= taille; j++) {
-            const cell = document.createElement('div');
-
-            let typeCase;
-            if (j % 2 === 0 && i % 2 === 1) {
-              typeCase = 'borderRow';
-            } else if (j % 2 === 1 && i % 2 === 1){
-              typeCase = 'intersectionRow';
-            } else if (j % 2 === 1 && i % 2 === 0){
-              typeCase = 'border';
-            } else if (j % 2 === 0 && i % 2 === 0){
-              typeCase = 'tile';
-            }
-            
-            let idColor = this.calquesGameDesign[calque][i-1][j-1];
-            cell.classList.add('cell', typeCase, `cell-${idColor}`);
-    
-
-            rowElement.appendChild(cell);
-          }
-      
-          gridElement.appendChild(rowElement);
-        }
-      }
-      
-    }
-      
 
         // Lancer la partie : rappel du niveau
         // Rappel du rôle puis de l'explication du rôle
