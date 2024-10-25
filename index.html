@@ -22,8 +22,8 @@
                 <p x-text="'Essai n°'+ nbTry"></p>
                 <p x-text="'Joueur actif : ' + joueurActif"></p>
 
-                <b><p x-text="calqueVisible ? 'Calque visible : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p></b>
-                <b><p x-text="calqueActif ? 'Calque désactivé : ' + calquesText[calqueActif] + ' - ' + calquesExplanationActive[calqueActif] : 'Aucun calque désactivé pour le moment'"></p></b>
+                <aside>Historique des actions</aside>
+                <div id="scrollable-div"></div>
     
             </fieldset>
         </section>
@@ -41,13 +41,16 @@
                 <button @click="explore() ; isDisabled = true" :disabled="isDisabled">Aperçu de tous les calques</button>
 
                 <div>
-                    <button @click="displayGrid('SPY','Exit','.grid',true)">Sortie</button>
-                    <button @click="displayGrid('SPY','Bordures','.grid',true)">Bordures</button>
-                    <button @click="displayGrid('SPY','Mines','.grid',true)">Mines</button>
-                    <button @click="displayGrid('SPY','Camera','.grid',true)">Caméra</button>
-                    <button @click="displayGrid('SPY','Laser','.grid',true)">Laser</button>
+                    <button @click="displayGrid('SPY','Exit','.grid',true)" :disabled="!isDisabled">Sortie</button>
+                    <button @click="displayGrid('SPY','Bordures','.grid',true)" :disabled="!isDisabled">Bordures</button>
+                    <button @click="displayGrid('SPY','Mines','.grid',true)" :disabled="!isDisabled">Mines</button>
+                    <button @click="displayGrid('SPY','Camera','.grid',true)" :disabled="!isDisabled">Caméra</button>
+                    <button @click="displayGrid('SPY','Laser','.grid',true)" :disabled="!isDisabled">Laser</button>
                 </div>
             </div>
+
+            <b><p x-text="calqueVisible ? 'Calque visible : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p></b>
+            <b><p x-text="calqueActif ? 'Calque désactivé : ' + calquesText[calqueActif] + ' - ' + calquesExplanationActive[calqueActif] : 'Aucun calque désactivé pour le moment'"></p></b>
 
             <div id="screenCalqueVisible" class="grid"></div>
             <div x-show="calqueVisible === 'Laser'" x-text="'Nombre de cycles avant prochain déplacement vers le bord opposé au laser : ' + nbCycleBeforeMoveLaser"></div>

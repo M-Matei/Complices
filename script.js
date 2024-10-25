@@ -37,7 +37,7 @@ const app = () => {
 
     calquesExplanationActive : {
       "Exit" : "La bordure qui permet au prisonnier de s'échapper est traversable.",
-      "Bordures" : "ATTENTION ! Les bordures du niveau sont JAMAIS traversables. ATTENTION !",
+      "Bordures" : "ATTENTION ! Les bordures du niveau ne sont JAMAIS traversables.",
       "Mines" : "Les mines ne se déclenchent pas lorsque le joueur entre dans une case qui en contient.",
       "Camera" : "La caméra ne fonctionne plus, entrer dans son champ de vision n'a pas d'effet.",
       "Laser" : "Le nombre de cycle du laser est bloqué et le laser éteint tant que le calque désactivé ne change pas."
@@ -119,8 +119,8 @@ const app = () => {
 
     // Interface SPY
     allCalques : false,
-    calqueVisible : null,
-    calqueActif : null,
+    calqueVisible : 'Aucun',
+    calqueActif : 'Aucun',
     isDisabled : false,
 
     exploreAllLayers : false,
@@ -139,6 +139,8 @@ const app = () => {
     nbDisjoncteur : 1,
     nbPiratage : 1,
     nbDeminage : 2,
+
+    history : [],
 
     playerPosition : [
         [0, 0, 0, 0, 0, 0, 0, 0, 0], // Ligne : Bordures
@@ -160,6 +162,8 @@ const app = () => {
       this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
 
       this.nbCycleBeforeMoveLaser = 4 ;
+
+      this.history("> Partie initialisée : cycle, essai et joueur actif");
     },
 
     wait(ms) {
@@ -171,14 +175,23 @@ const app = () => {
         this.displayGrid('SPY', calque, '.grid', false);
         await this.wait(800);
       }
+
+      this.history("> L'espion a eu un aperçu de la configuration du CUBE");
+
     },
 
     giveHand(whom){
       if (whom === this.roles[0]) {
         this.joueurActif = this.roles[0];
+
+        this.history("> L'espion a désormais la main");
+
       } else {
         this.joueurActif = this.roles[1];
         this.displayGrid('PRISONNER', this.playerPosition, '.gridPrisonner', true);
+
+        this.history("> Le prisonnier a désormais la main");
+
       }
       this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
       this.nbCycle++ ;
@@ -188,11 +201,28 @@ const app = () => {
         this.moveLaser();
         let coordsPlayer = this.playerPos();
 
+        this.history("> Déplacement du laser");
+
+
         if (coordsPlayer[0]+1 === this.laserActuel) {
           alert('Vous avez été rattrapé et grillé par le fil laser !');
+          this.history("> ERREUR : Le prisonnier a été rattrapé et grillé par le fil laser");
           this.nbTry++ ;
         }
       }
+    },
+
+    history(action){
+      var newAction = document.createElement('p');
+      newAction.textContent = action ;
+
+        // Sélectionner l'élément parent où insérer le paragraphe
+        var parent = document.querySelector('#scrollable-div');
+
+        if (parent) {
+          parent.appendChild(newAction);
+          parent.scrollTop = parent.scrollHeight - parent.clientHeight;
+        }
     },
 
     playerPos(){
@@ -239,53 +269,65 @@ const app = () => {
       switch(move){
         case 'TOP':
           if (coords[0] > 2) {
-            if (this.calquesGameDesign['Bordures'][coords[0]-1][coords[1]]) {
+            if (this.calquesGameDesign['Bordures'][coords[0]-1][coords[1]] === 2) {
               alert('Game over, vous avez touché une bordure intérieure');
+              this.history('> ERREUR, vous avez touché une bordure intérieure');
               this.nbTry++;
             } else {
               this.updateGrid(coords[0]-2, coords[1]);
+              this.history('> Le prisonnier s\'est déplacé vers le haut');
             }
           } else {
             alert('Game over, vous avez touché une bordure extérieure');
+            this.history('> ERREUR, vous avez touché une bordure extérieure');
             this.nbTry++;
           }
           break;
         case 'LEFT':
           if (coords[1] > 2) {
-            if (this.calquesGameDesign['Bordures'][coords[0]][coords[1]-1]) {
+            if (this.calquesGameDesign['Bordures'][coords[0]][coords[1]-1] === 2) {
               alert('Game over, vous avez touché une bordure intérieure');
+              this.history('> ERREUR, vous avez touché une bordure intérieure');
               this.nbTry++;
             } else {
               this.updateGrid(coords[0], coords[1]-2);
+              this.history('> Le prisonnier s\'est déplacé vers la gauche');
             }
           } else {
             alert('Game over, vous avez touché une bordure extérieure');
+            this.history('> ERREUR, vous avez touché une bordure extérieure');
             this.nbTry++;
           }
           break;
         case 'RIGHT':
           if (coords[1] < nbColumn-2) {
-            if (this.calquesGameDesign['Bordures'][coords[0]][coords[1]+1]) {
+            if (this.calquesGameDesign['Bordures'][coords[0]][coords[1]+1] === 2) {
               alert('Game over, vous avez touché une bordure intérieure');
+              this.history('> ERREUR, vous avez touché une bordure intérieure');
               this.nbTry++;
             } else {
               this.updateGrid(coords[0], coords[1]+2);
+              this.history('> Le prisonnier s\'est déplacé vers la droite');
             }
           } else {
             alert('Game over, vous avez touché une bordure extérieure');
+            this.history('> ERREUR, vous avez touché une bordure extérieure');
             this.nbTry++;
           }
           break;
         case 'BOTTOM':
           if (coords[0] < nbRow-2) {
-            if (this.calquesGameDesign['Bordures'][coords[0]+1][coords[1]]) {
+            if (this.calquesGameDesign['Bordures'][coords[0]+1][coords[1]] === 2) {
               alert('Game over, vous avez touché une bordure intérieure');
+              this.history('> ERREUR, vous avez touché une bordure intérieure');
               this.nbTry++;
             } else {
               this.updateGrid(coords[0]+2, coords[1]);
+              this.history('> Le prisonnier s\'est déplacé vers le bas');
             }
           } else {
             alert('Game over, vous avez touché une bordure extérieure');
+            this.history('> ERREUR, vous avez touché une bordure extérieure');
             this.nbTry++;
           }
           break;
@@ -296,12 +338,16 @@ const app = () => {
       switch(compteur){
         case 'nbPiratage':
           this.nbPiratage-- ;
+          this.history('>>> Pirater (action spéciale) a été utilisé par le prisonnier');
           break;
         case 'nbDeminage':
           this.nbDeminage-- ;
+          this.history('>>> Déminer (action spéciale) a été utilisé par le prisonnier');
           break;
         case 'nbDisjoncteur':
           this.nbDisjoncteur-- ;
+          this.history('>>> Disjoncter (action spéciale) a été utilisé par le prisonnier');
+
           break;
       }
     },
@@ -351,11 +397,14 @@ const app = () => {
 
     displayGrid(side, calque, classHTML, boolCount){
 
-      if (side === 'SPY' && boolCount === true) {
+      if (side === 'SPY' && boolCount === true && this.calqueVisible !== calque) {
         this.calqueActif = this.calqueVisible ;
         this.calqueVisible = calque ;
         this.nbCycle++ ;
         this.nbCycleBeforeMoveLaser-- ;
+
+        this.history(`> CHANGEMENTS : calque visible : ${calque}, calque actif : ${this.calqueActif}`);
+
 
         if (this.nbCycleBeforeMoveLaser === 0){
           this.moveLaser();
