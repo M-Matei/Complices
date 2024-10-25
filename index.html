@@ -16,6 +16,7 @@
 
         <!-- INTERFACE -->
         <section>
+            <h1>Complices</h1>
             <fieldset>
                 <legend><b>Common UI</b></legend>
                 <p x-text="'Cycle n°' + nbCycle"></p>
@@ -24,6 +25,11 @@
 
                 <aside>Historique des actions</aside>
                 <div id="scrollable-div"></div>
+
+
+            <b><p x-text="calqueVisible ? 'Calque visible pour l\'espion : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p></b>
+            <b><p x-text="calqueActif ? 'Calque désactivé pour le prisonnier : ' + calquesText[calqueActif] + ' - ' + calquesExplanationActive[calqueActif] : 'Aucun calque désactivé pour le moment'"></p></b>
+
     
             </fieldset>
         </section>
@@ -48,9 +54,6 @@
                     <button @click="displayGrid('SPY','Laser','.grid',true)" :disabled="!isDisabled">Laser</button>
                 </div>
             </div>
-
-            <b><p x-text="calqueVisible ? 'Calque visible : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p></b>
-            <b><p x-text="calqueActif ? 'Calque désactivé : ' + calquesText[calqueActif] + ' - ' + calquesExplanationActive[calqueActif] : 'Aucun calque désactivé pour le moment'"></p></b>
 
             <div id="screenCalqueVisible" class="grid"></div>
             <div x-show="calqueVisible === 'Laser'" x-text="'Nombre de cycles avant prochain déplacement vers le bord opposé au laser : ' + nbCycleBeforeMoveLaser"></div>

@@ -207,9 +207,8 @@ const app = () => {
 
         this.history("> Déplacement du laser");
 
-
         if (coordsPlayer[0]+1 === this.laserActuel) {
-          alert('Vous avez été rattrapé et grillé par le fil laser !');
+          alert('Le prisonnier a été rattrapé et grillé par le fil laser !');
           this.history("> ERREUR : Le prisonnier a été rattrapé et grillé par le fil laser");
           this.nbTry++ ;
         }
@@ -282,7 +281,12 @@ const app = () => {
             coordY = 0 ;
             direction = 'le haut';
           } else {
-            borderError = true ;
+            if (this.calqueActif === 'Sortie') {
+              coordX = -1 ;
+              coordY = 0 ;
+            } else {
+              borderError = true ;
+            }
           }
           break;
         case 'LEFT':
@@ -291,7 +295,12 @@ const app = () => {
             coordY = -1;
             direction = 'la gauche';
           } else {
-            borderError = true ;
+            if (this.calqueActif === 'Sortie') {
+              coordX = 0 ;
+              coordY = -1 ;
+            } else {
+              borderError = true ;
+            }
           }
           break;
         case 'RIGHT':
@@ -300,7 +309,12 @@ const app = () => {
             coordY = 1 ;
             direction = 'la droite';
           } else {
-            borderError = true ;
+            if (this.calqueActif === 'Sortie') {
+              coordX = 0 ;
+              coordY = 1 ;
+            } else {
+              borderError = true ;
+            }
           }
           break;
         case 'BOTTOM':
@@ -309,18 +323,24 @@ const app = () => {
             coordY = 0 ;
             direction = 'le bas';
           } else {
-            borderError = true ;
+            if (this.calqueActif === 'Sortie') {
+              coordX = 1 ;
+              coordY = 0 ;
+            } else {
+              borderError = true ;
+            }
           }
           break;
       }
 
-      if (this.calquesGameDesign['Bordures'][coords[0] + coordX][coords[1] + coordY] === 2) {
-        alert('Game over, vous avez touché une bordure intérieure');
-        this.history('> ERREUR, vous avez touché une bordure intérieure');
-        this.nbTry++;
-      } else if (this.calqueActif = 'Sortie' && this.calquesGameDesign['Sortie'][coords[0] + coordX][coords[1] + coordY] === 1) {
+      if (this.calqueActif === 'Sortie' && this.calquesGameDesign['Sortie'][coords[0] + coordX][coords[1] + coordY] === 1) {
         alert('VICTOIRE, vous réussi à vous échapper grâce à votre complice en ' + this.nbTry + ' essai(s) !');
         this.history('> Victoire en ' + this.nbTry + ' essai(s) !');
+        this.wait(1000);
+        window.location.reload(true);
+      } else if (this.calquesGameDesign['Bordures'][coords[0] + coordX][coords[1] + coordY] === 2) {
+        alert('Game over, vous avez touché une bordure intérieure');
+        this.history('> ERREUR, vous avez touché une bordure intérieure');
         this.nbTry++;
       } else {
         this.updateGrid(coords[0] + coordX*2, coords[1] + coordY*2);
@@ -405,11 +425,20 @@ const app = () => {
 
         if (this.calqueActif === null) this.calqueActif = 'Aucun';
         this.history(`> CHANGEMENTS : calque visible : ${calque}, calque actif : ${this.calqueActif}`);
-        this.calqueActif = null ;
+        if (this.calqueActif === 'Aucun') this.calqueActif = null ;
 
 
         if (this.nbCycleBeforeMoveLaser === 0){
           this.moveLaser();
+          let coordsPlayer = this.playerPos();
+
+          this.history("> Déplacement du laser");
+
+          if (coordsPlayer[0]+1 === this.laserActuel) {
+            alert('Le prisonnier a été rattrapé et grillé par le fil laser !');
+            this.history("> ERREUR : Le prisonnier a été rattrapé et grillé par le fil laser");
+            this.nbTry++ ;
+          }
         }
       }
 
