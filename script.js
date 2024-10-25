@@ -25,7 +25,7 @@ const app = () => {
     },
 
     calquesText : {
-      "Exit" : "Sortie du niveau",
+      "Sortie" : "Sortie du niveau",
       "Bordures" : "Bordures du niveau",
       "Mines" : "Emplacements des mines",
       "Camera" : "Champ de vision de la caméra et port de piratage de celle-ci",
@@ -36,7 +36,7 @@ const app = () => {
     },
 
     calquesExplanationActive : {
-      "Exit" : "La bordure qui permet au prisonnier de s'échapper est traversable.",
+      "Sortie" : "La bordure qui permet au prisonnier de s'échapper est traversable.",
       "Bordures" : "ATTENTION ! Les bordures du niveau ne sont JAMAIS traversables.",
       "Mines" : "Les mines ne se déclenchent pas lorsque le joueur entre dans une case qui en contient.",
       "Camera" : "La caméra ne fonctionne plus, entrer dans son champ de vision n'a pas d'effet.",
@@ -44,7 +44,7 @@ const app = () => {
     },
 
     calquesGameDesign : {
-    "Exit" : [
+    "Sortie" : [
         [0, 0, 0, 0, 0, 0, 0, 0, 0], // Ligne : Bordures
         [0, 0, 0, 0, 0, 0, 0, 0, 0], // Ligne : Case
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -102,7 +102,7 @@ const app = () => {
   
 
     // Calques : propriétés
-    listCalques : ['Exit', 'Bordures', 'Mines', 'Camera', 'Laser'],
+    listCalques : ['Sortie', 'Bordures', 'Mines', 'Camera', 'Laser'],
 
     // Interface COMMUNE
     nbCycle : null,
@@ -119,8 +119,8 @@ const app = () => {
 
     // Interface SPY
     allCalques : false,
-    calqueVisible : 'Aucun',
-    calqueActif : 'Aucun',
+    calqueVisible : null,
+    calqueActif : null,
     isDisabled : false,
 
     exploreAllLayers : false,
@@ -139,6 +139,10 @@ const app = () => {
     nbDisjoncteur : 1,
     nbPiratage : 1,
     nbDeminage : 2,
+
+    immuneLaser : false,
+    immuneCamera : false,
+    immuneMine: false,
 
     history : [],
 
@@ -266,71 +270,67 @@ const app = () => {
       let nbColumn = 8;
       let coords = this.playerPos();
 
+      let coordX = 0;
+      let coordY = 0;
+      let borderError = false;
+      let direction = '';
+
       switch(move){
         case 'TOP':
           if (coords[0] > 2) {
-            if (this.calquesGameDesign['Bordures'][coords[0]-1][coords[1]] === 2) {
-              alert('Game over, vous avez touché une bordure intérieure');
-              this.history('> ERREUR, vous avez touché une bordure intérieure');
-              this.nbTry++;
-            } else {
-              this.updateGrid(coords[0]-2, coords[1]);
-              this.history('> Le prisonnier s\'est déplacé vers le haut');
-            }
+            coordX = -1;
+            coordY = 0 ;
+            direction = 'le haut';
           } else {
-            alert('Game over, vous avez touché une bordure extérieure');
-            this.history('> ERREUR, vous avez touché une bordure extérieure');
-            this.nbTry++;
+            borderError = true ;
           }
           break;
         case 'LEFT':
           if (coords[1] > 2) {
-            if (this.calquesGameDesign['Bordures'][coords[0]][coords[1]-1] === 2) {
-              alert('Game over, vous avez touché une bordure intérieure');
-              this.history('> ERREUR, vous avez touché une bordure intérieure');
-              this.nbTry++;
-            } else {
-              this.updateGrid(coords[0], coords[1]-2);
-              this.history('> Le prisonnier s\'est déplacé vers la gauche');
-            }
+            coordX = 0;
+            coordY = -1;
+            direction = 'la gauche';
           } else {
-            alert('Game over, vous avez touché une bordure extérieure');
-            this.history('> ERREUR, vous avez touché une bordure extérieure');
-            this.nbTry++;
+            borderError = true ;
           }
           break;
         case 'RIGHT':
           if (coords[1] < nbColumn-2) {
-            if (this.calquesGameDesign['Bordures'][coords[0]][coords[1]+1] === 2) {
-              alert('Game over, vous avez touché une bordure intérieure');
-              this.history('> ERREUR, vous avez touché une bordure intérieure');
-              this.nbTry++;
-            } else {
-              this.updateGrid(coords[0], coords[1]+2);
-              this.history('> Le prisonnier s\'est déplacé vers la droite');
-            }
+            coordX = 0;
+            coordY = 1 ;
+            direction = 'la droite';
           } else {
-            alert('Game over, vous avez touché une bordure extérieure');
-            this.history('> ERREUR, vous avez touché une bordure extérieure');
-            this.nbTry++;
+            borderError = true ;
           }
           break;
         case 'BOTTOM':
           if (coords[0] < nbRow-2) {
-            if (this.calquesGameDesign['Bordures'][coords[0]+1][coords[1]] === 2) {
-              alert('Game over, vous avez touché une bordure intérieure');
-              this.history('> ERREUR, vous avez touché une bordure intérieure');
-              this.nbTry++;
-            } else {
-              this.updateGrid(coords[0]+2, coords[1]);
-              this.history('> Le prisonnier s\'est déplacé vers le bas');
-            }
+            coordX = 1 ;
+            coordY = 0 ;
+            direction = 'le bas';
           } else {
-            alert('Game over, vous avez touché une bordure extérieure');
-            this.history('> ERREUR, vous avez touché une bordure extérieure');
-            this.nbTry++;
+            borderError = true ;
           }
           break;
+      }
+
+      if (this.calquesGameDesign['Bordures'][coords[0] + coordX][coords[1] + coordY] === 2) {
+        alert('Game over, vous avez touché une bordure intérieure');
+        this.history('> ERREUR, vous avez touché une bordure intérieure');
+        this.nbTry++;
+      } else if (this.calqueActif = 'Sortie' && this.calquesGameDesign['Sortie'][coords[0] + coordX][coords[1] + coordY] === 1) {
+        alert('VICTOIRE, vous réussi à vous échapper grâce à votre complice en ' + this.nbTry + ' essai(s) !');
+        this.history('> Victoire en ' + this.nbTry + ' essai(s) !');
+        this.nbTry++;
+      } else {
+        this.updateGrid(coords[0] + coordX*2, coords[1] + coordY*2);
+        this.history('> Le prisonnier s\'est déplacé vers ' + direction);
+      }
+
+      if (borderError) {
+        alert('Game over, vous avez touché une bordure extérieure');
+        this.history('> ERREUR, vous avez touché une bordure extérieure');
+        this.nbTry++;
       }
     },
 
@@ -403,7 +403,9 @@ const app = () => {
         this.nbCycle++ ;
         this.nbCycleBeforeMoveLaser-- ;
 
+        if (this.calqueActif === null) this.calqueActif = 'Aucun';
         this.history(`> CHANGEMENTS : calque visible : ${calque}, calque actif : ${this.calqueActif}`);
+        this.calqueActif = null ;
 
 
         if (this.nbCycleBeforeMoveLaser === 0){
