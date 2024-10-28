@@ -1,3 +1,20 @@
+body {
+    margin: 0;
+}
+.screen1, .screen2 {
+    position: absolute;
+    top: 0;
+    height: 100vh;
+}
+.screen1 {
+    left: 0;
+    width: 50vw; /* Première moitié de l'écran */
+}
+.screen2 {
+    left: 50vw;
+    width: 50vw; /* Deuxième moitié de l'écran */
+}
+
 .grid {
     display: flex;
     flex-direction: column;
@@ -5,7 +22,7 @@
     margin: 10px;
 }
 
-#scrollable-div {
+.scrollable-div {
     height: 200px; /* Hauteur fixe de la div */
     border: 1px solid #000; /* Bordure pour visualiser la div */
     overflow-y: scroll; /* Activer le défilement vertical */

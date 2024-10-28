@@ -6,6 +6,8 @@
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <link rel="icon" href="jail.ico" type="image/x-icon">
+
     <script type="text/javascript" src="script.js"></script>
     <link rel="stylesheet" href="styleLevel.css"></script>
 
@@ -14,30 +16,26 @@
 <body>
     <main x-data="app()" x-init="">
 
-        <!-- INTERFACE -->
-        <section>
-            <h1>Complices</h1>
-            <fieldset>
-                <legend><b>Common UI</b></legend>
-                <p x-text="'Cycle n°' + nbCycle"></p>
-                <p x-text="'Essai n°'+ nbTry"></p>
-                <p x-text="'Joueur actif : ' + joueurActif"></p>
-
-                <aside>Historique des actions</aside>
-                <div id="scrollable-div"></div>
-
-            </fieldset>
-        </section>
-
-        <!-- Calque visible -->
-        <section>
-        </section>
-
-
         <!-- SPY -->
-        <section x-show="spyBoard">
+        <section class="screen1">
             <div>
-                <h2>SPY board</h2>
+
+                <section>
+                    <h1>Complices</h1>
+                    <fieldset>
+                        <legend><b>Common UI</b></legend>
+                        <p x-text="'Cycle n°' + nbCycle"></p>
+                        <p x-text="'Essai n°'+ nbTry"></p>
+                        <p x-text="'Joueur actif : ' + joueurActif"></p>
+        
+                        <aside>Historique des actions</aside>
+                        <div class="scrollable-div"></div>
+        
+                    </fieldset>
+                </section>
+
+                <h2>SPY board - Joueur Souris</h2>
+
 
                 <b><p x-text="calqueVisible ? 'Calque visible pour l\'espion : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p></b>
                 <b><p x-text="calqueActif ? 'Calque désactivé pour le prisonnier : ' + calquesText[calqueActif] + ' - ' + calquesExplanationActive[calqueActif] : 'Aucun calque désactivé pour le moment'"></p></b>    
@@ -56,37 +54,52 @@
             <div id="screenCalqueVisible" class="grid"></div>
             <div x-show="calqueVisible === 'Laser'" x-text="'Nombre de cycles avant prochain déplacement vers le bord opposé au laser : ' + nbCycleBeforeMoveLaser"></div>
 
-            <button @click="giveHand('PRISONNER')">PASSER LA MAIN</button>
+            <button @click="giveHand('PRISONNER')" :disabled="!spyBoard">PASSER LA MAIN</button>
 
         </section>
 
 
         <!-- PRISONNER  -->
-        <section x-show="!spyBoard">
+        <section class="screen2">
             <div>
-                <h2>PRISONNER board</h2>
+
+                <section>
+                    <h1>Complices</h1>
+                    <fieldset>
+                        <legend><b>Common UI</b></legend>
+                        <p x-text="'Cycle n°' + nbCycle"></p>
+                        <p x-text="'Essai n°'+ nbTry"></p>
+                        <p x-text="'Joueur actif : ' + joueurActif"></p>
+        
+                        <aside>Historique des actions</aside>
+                        <div class="scrollable-div"></div>
+        
+                    </fieldset>
+                </section>
+
+                <h2>PRISONNER board - Joueur Clavier</h2>
 
                 <h3>Déplacement</h3>
-                <button @click="player(moves[0], '')">&uarr;</button>
-                <button @click="player(moves[2], '')">&larr;</button>
-                <button @click="player(moves[3], '')">&rarr;</button>
-                <button @click="player(moves[1], '')">&darr;</button>
+                <button>&uarr;</button>
+                <button>&larr;</button>
+                <button>&rarr;</button>
+                <button>&darr;</button>
 
                 <br><h3>Actions spéciales</h3>
-                <button @click="reduce('nbDisjoncteur') ; player('', 'Disjoncter')" x-text="'Disjoncteur LASER * ' + nbDisjoncteur" :disabled="nbDisjoncteur === 0"></button>
-                <button @click="reduce('nbPiratage') ; player('', 'Pirater')" x-text="'Piratage des caméras * ' + nbPiratage" :disabled="nbPiratage === 0"></button>
+                <button x-text="'[L] Disjoncteur LASER * ' + nbDisjoncteur" :disabled="nbDisjoncteur === 0"></button>
+                <button x-text="'[P] Piratage des caméras * ' + nbPiratage" :disabled="nbPiratage === 0"></button>
 
                 <br><br>
                 <legend x-text="'Déminage directionnel * ' + nbDeminage"></legend>
-                <button @click="reduce('nbDeminage') ; player(moves[0], 'Deminage')" :disabled="nbDeminage === 0">Déminage &uarr; puis déplacement</button>
-                <button @click="reduce('nbDeminage') ; player(moves[2], 'Deminage')" :disabled="nbDeminage === 0">Déminage &larr; puis déplacement</button>
-                <button @click="reduce('nbDeminage') ; player(moves[3], 'Deminage')" :disabled="nbDeminage === 0">Déminage &rarr; puis déplacement</button>
-                <button @click="reduce('nbDeminage') ; player(moves[1], 'Deminage')" :disabled="nbDeminage === 0">Déminage &darr; puis déplacement</button>
+                <button :disabled="nbDeminage === 0">[W] Déminage &uarr; puis déplacement</button>
+                <button :disabled="nbDeminage === 0">[S] Déminage &larr; puis déplacement</button>
+                <button :disabled="nbDeminage === 0">[A] Déminage &rarr; puis déplacement</button>
+                <button :disabled="nbDeminage === 0">[D] Déminage &darr; puis déplacement</button>
                 
 
                 <br><br><div class="gridPrisonner"></div>
 
-                <br><button @click="giveHand('SPY')">PASSER LA MAIN</button>
+                <br><button @click="giveHand('SPY')" :disabled="spyBoard">PASSER LA MAIN</button>
             </div>
 
         </section>

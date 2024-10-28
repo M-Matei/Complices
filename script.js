@@ -223,7 +223,7 @@ const app = () => {
       newAction.textContent = action ;
 
         // Sélectionner l'élément parent où insérer le paragraphe
-        var parent = document.querySelector('#scrollable-div');
+        var parent = document.querySelector('.scrollable-div');
 
         if (parent) {
           parent.appendChild(newAction);
@@ -574,4 +574,50 @@ const app = () => {
 
   }
 }
+
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+      case 'ArrowUp':
+        player(moves[0], '');
+        break;
+      case 'ArrowLeft':
+        player(moves[2], '');
+        break;
+      case 'ArrowRight':
+        player(moves[3], '');
+        break;
+      case 'ArrowDown':
+        player(moves[1], '');
+        break;
+      case 'w':
+        reduce('nbDeminage');
+        player(moves[0], 'Deminage');
+        break;
+      case 'a':
+        reduce('nbDeminage');
+        player(moves[2], 'Deminage');
+        break;
+      case 'd':
+        reduce('nbDeminage');
+        player(moves[3], 'Deminage');
+        break;
+      case 's':
+        reduce('nbDeminage');
+        player(moves[1], 'Deminage');
+        break;
+      case 'l':
+        reduce('nbDisjoncteur') ;
+        player('', 'Disjoncter');
+        break;
+      case 'p':
+        reduce('nbPiratage') ; 
+        player('', 'Pirater');
+        break;
+    }
+  });
+
+});
 
