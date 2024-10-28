@@ -132,7 +132,7 @@ const app = () => {
     positionOrdPlayer : null,
 
     moves : ['TOP', 'BOTTOM', 'LEFT', 'RIGHT'],
-    actions : ['Disjoncter', 'TopDeminage', 'BottomDeminage', 'LeftDeminage', 'RightDeminage', 'Pirater'],
+    actions : ['Disjoncter', 'Deminage', 'Pirater'],
 
     laserActuel : 0,
 
@@ -141,8 +141,6 @@ const app = () => {
     nbDeminage : 2,
 
     immuneLaser : false,
-    immuneCamera : false,
-    immuneMine: false,
 
     history : [],
 
@@ -167,7 +165,7 @@ const app = () => {
 
       this.nbCycleBeforeMoveLaser = 4 ;
 
-      this.history("> Partie initialisée : cycle, essai et joueur actif");
+      this.history("> Partie initialisée : Cycle n°1, essai n°1 et joueur actif : SPY");
     },
 
     wait(ms) {
@@ -182,6 +180,7 @@ const app = () => {
 
       this.history("> L'espion a eu un aperçu de la configuration du CUBE");
 
+      this.isDisabled = true ;
     },
 
     giveHand(whom){
@@ -193,6 +192,10 @@ const app = () => {
       } else {
         this.joueurActif = this.roles[1];
         this.displayGrid('PRISONNER', this.playerPosition, '.gridPrisonner', true);
+
+        this.immuneCamera = false ;
+        this.immuneLaser = false ;
+        this.immuneMine = false ;
 
         this.history("> Le prisonnier a désormais la main");
 
@@ -207,9 +210,9 @@ const app = () => {
 
         this.history("> Déplacement du laser");
 
-        if (coordsPlayer[0]+1 === this.laserActuel) {
+        if (coordsPlayer[0]+1 === this.laserActuel && this.immuneLaser === false) {
           alert('Le prisonnier a été rattrapé et grillé par le fil laser !');
-          this.history("> ERREUR : Le prisonnier a été rattrapé et grillé par le fil laser");
+          this.history("> ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser");
           this.nbTry++ ;
         }
       }
@@ -264,7 +267,7 @@ const app = () => {
       }
     },
 
-    player(move){
+    player(move, action){
       let nbRow = 8;
       let nbColumn = 8;
       let coords = this.playerPos();
@@ -272,7 +275,9 @@ const app = () => {
       let coordX = 0;
       let coordY = 0;
       let borderError = false;
+      let immobile = false ;
       let direction = '';
+      let camSuccess = false ;
 
       switch(move){
         case 'TOP':
@@ -331,25 +336,62 @@ const app = () => {
             }
           }
           break;
+        case '':
+          immobile = true ;
+          if (action === this.actions[2]) {
+            if (this.calquesGameDesign['Camera'][coords[0]][coords[1]] === 5){
+              this.calquesGameDesign['Camera'] = this.calquesGameDesign['Camera'].map(row => row.map(() => 0));
+              camSuccess = true ;
+            }
+          }
+          break;
+      }
+
+      if (action === this.actions[1]){
+        if (this.calquesGameDesign['Mines'][coords[0] + coordX*2][coords[1] + coordY*2] === 4){
+          this.calquesGameDesign['Mines'][coords[0] + coordX*2][coords[1] + coordY*2] = 0 ;
+          direction += ' après avoir désamorcé une mine avec succès!';
+        } else {
+          direction += ', il n\'y avait pas de mine à désamorcer sur la case d\'arrivée.';
+        }
       }
 
       if (this.calqueActif === 'Sortie' && this.calquesGameDesign['Sortie'][coords[0] + coordX][coords[1] + coordY] === 1) {
         alert('VICTOIRE, vous réussi à vous échapper grâce à votre complice en ' + this.nbTry + ' essai(s) !');
         this.history('> Victoire en ' + this.nbTry + ' essai(s) !');
-        this.wait(1000);
-        window.location.reload(true);
       } else if (this.calquesGameDesign['Bordures'][coords[0] + coordX][coords[1] + coordY] === 2) {
-        alert('Game over, vous avez touché une bordure intérieure');
-        this.history('> ERREUR, vous avez touché une bordure intérieure');
+        alert('ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez touché une bordure intérieure');
+        this.history('> ÉCHEC DE L\'ESSAI, vous avez touché une bordure intérieure');
         this.nbTry++;
+      } else if (this.calqueActif !== 'Mines' &&  this.calquesGameDesign['Mines'][coords[0] + coordX*2][coords[1] + coordY*2] === 4) {
+        alert('ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez déclenchez une mine');
+        this.history('> ÉCHEC DE L\'ESSAI, vous avez déclenchez une mine');
+        this.nbTry++;
+        this.calquesGameDesign['Mines'][coords[0] + coordX*2][coords[1] + coordY*2] = 0 ;
+      } else if (this.calqueActif !== 'Camera' &&  this.calquesGameDesign['Camera'][coords[0] + coordX*2][coords[1] + coordY*2] === 6) {
+        alert('ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous êtes entrer dans le champ de vision de la caméra!');
+        this.history('> ÉCHEC DE L\'ESSAI, vous êtes entrer dans le champ de vision de la caméra!');
+        this.nbTry++;
+      } else if (move === '' && action === this.actions[2]){
+        if (camSuccess) {
+          this.history('> La caméra a été coupée, son champ de vision est désormais nul !');
+        } else {
+          this.history('> Le prisonnier a essayé de pirater la caméra de surveillance depuis une tuile qui ne le permettait pas !');
+        }
       } else {
-        this.updateGrid(coords[0] + coordX*2, coords[1] + coordY*2);
-        this.history('> Le prisonnier s\'est déplacé vers ' + direction);
+        if (!immobile) {
+          this.updateGrid(coords[0] + coordX*2, coords[1] + coordY*2);
+          this.history('> Le prisonnier s\'est déplacé vers ' + direction);
+        } else {
+
+          this.history('> Le prisonnier s\'est déplacé vers ' + direction);
+        }
+        
       }
 
       if (borderError) {
-        alert('Game over, vous avez touché une bordure extérieure');
-        this.history('> ERREUR, vous avez touché une bordure extérieure');
+        alert('ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez touché une bordure extérieure');
+        this.history('> ÉCHEC DE L\'ESSAI, vous avez touché une bordure extérieure');
         this.nbTry++;
       }
     },
@@ -367,13 +409,9 @@ const app = () => {
         case 'nbDisjoncteur':
           this.nbDisjoncteur-- ;
           this.history('>>> Disjoncter (action spéciale) a été utilisé par le prisonnier');
-
+          this.immuneLaser = true ;
           break;
       }
-    },
-
-    act(what){
-      //
     },
 
     moveLaser(){
@@ -434,9 +472,9 @@ const app = () => {
 
           this.history("> Déplacement du laser");
 
-          if (coordsPlayer[0]+1 === this.laserActuel) {
+          if (coordsPlayer[0]+1 === this.laserActuel && this.immuneLaser === false) {
             alert('Le prisonnier a été rattrapé et grillé par le fil laser !');
-            this.history("> ERREUR : Le prisonnier a été rattrapé et grillé par le fil laser");
+            this.history("> ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser");
             this.nbTry++ ;
           }
         }
