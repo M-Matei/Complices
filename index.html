@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,10 +23,10 @@
                 <section>
                     <h1>Complices</h1>
                     <fieldset>
-                        <legend><b>Common UI</b></legend>
+                        <legend><b>Interface globale</b></legend>
                         <p x-text="'Cycle n°' + nbCycle"></p>
                         <p x-text="'Essai n°'+ nbTry"></p>
-                        <p x-text="'Joueur actif : ' + joueurActif"></p>
+                        <!-- <p x-text="'Joueur actif : ' + joueurActif"></p> -->
         
                         <aside>Historique des actions</aside>
                         <div class="scrollable-div"></div>
@@ -34,7 +34,7 @@
                     </fieldset>
                 </section>
 
-                <h2>SPY board - Joueur Souris</h2>
+                <h3>Écran de l'espion - Joueur Souris</h3>
 
 
                 <b><p x-text="calqueVisible ? 'Calque visible pour l\'espion : ' + calquesText[calqueVisible] : 'Aucun calque visible, choississez-en un dans la liste'"></p></b>
@@ -54,7 +54,8 @@
             <div id="screenCalqueVisible" class="grid"></div>
             <div x-show="calqueVisible === 'Laser'" x-text="'Nombre de cycles avant prochain déplacement vers le bord opposé au laser : ' + nbCycleBeforeMoveLaser"></div>
 
-            <button @click="giveHand('PRISONNER')" :disabled="!spyBoard">PASSER LA MAIN</button>
+            <!-- Changement dans le gameplay : les joueurs jouent en simultané -->
+            <!-- <button @click="giveHand('PRISONNER')" :disabled="!spyBoard">PASSER LA MAIN</button> -->
 
         </section>
 
@@ -66,10 +67,10 @@
                 <section>
                     <h1>Complices</h1>
                     <fieldset>
-                        <legend><b>Common UI</b></legend>
+                        <legend><b>Interface globale</b></legend>
                         <p x-text="'Cycle n°' + nbCycle"></p>
                         <p x-text="'Essai n°'+ nbTry"></p>
-                        <p x-text="'Joueur actif : ' + joueurActif"></p>
+                        <!-- <p x-text="'Joueur actif : ' + joueurActif"></p> -->
         
                         <aside>Historique des actions</aside>
                         <div class="scrollable-div"></div>
@@ -77,29 +78,25 @@
                     </fieldset>
                 </section>
 
-                <h2>PRISONNER board - Joueur Clavier</h2>
+                <h3>Écran du prisonnier - Joueur Clavier</h3>
 
-                <h3>Déplacement</h3>
-                <button>&uarr;</button>
-                <button>&larr;</button>
-                <button>&rarr;</button>
-                <button>&darr;</button>
+                <div><b>Déplacements </b> [Fléches] &uarr; &larr; &rarr; &darr; </div>
+                
+                <div><h4>Actions spéciales</h4>
+                <p x-text="'[L] - Disjoncteur LASER * ' + nbDisjoncteur"></p>
+                <p x-text="'[P] - Piratage des caméras * ' + nbPiratage"></p>
 
-                <br><h3>Actions spéciales</h3>
-                <button x-text="'[L] Disjoncteur LASER * ' + nbDisjoncteur" :disabled="nbDisjoncteur === 0"></button>
-                <button x-text="'[P] Piratage des caméras * ' + nbPiratage" :disabled="nbPiratage === 0"></button>
-
-                <br><br>
-                <legend x-text="'Déminage directionnel * ' + nbDeminage"></legend>
-                <button :disabled="nbDeminage === 0">[W] Déminage &uarr; puis déplacement</button>
-                <button :disabled="nbDeminage === 0">[S] Déminage &larr; puis déplacement</button>
-                <button :disabled="nbDeminage === 0">[A] Déminage &rarr; puis déplacement</button>
-                <button :disabled="nbDeminage === 0">[D] Déminage &darr; puis déplacement</button>
+                <b x-text="'Déminage directionnel * ' + nbDeminage"></b>
+                <p>[W] - Déminage &uarr; puis déplacement</p>
+                <p>[S] - Déminage &larr; puis déplacement</p>
+                <p>[A] - Déminage &rarr; puis déplacement</p>
+                <p>[D] - Déminage &darr; puis déplacement</p>
                 
 
                 <br><br><div class="gridPrisonner"></div>
 
-                <br><button @click="giveHand('SPY')" :disabled="spyBoard">PASSER LA MAIN</button>
+                <!-- Changement dans le gameplay : les joueurs jouent en simultané -->
+                <!-- <br><button @click="giveHand('SPY')" :disabled="spyBoard">PASSER LA MAIN</button> -->
             </div>
 
         </section>

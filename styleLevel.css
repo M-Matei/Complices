@@ -102,3 +102,7 @@ body {
 .cell-7 {
     background-color: cyan;
 }
+/* Case d'apparition du joueur */
+.cell-8 {
+    background-color: purple;
+}

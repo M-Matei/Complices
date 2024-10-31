@@ -17,11 +17,13 @@ const app = () => {
       5 : "Port de piratage caméra", // jaune
       6 : "Champ de vision caméra", // orange
 
-      7 : "Position du joueur"
+      7 : "Position du joueur", // cyan
+
+      8 : "Case d'apparition du joueur" // violet
 
       /* BONIFICATION
-      8 : "Trappe (-1)",
-      9 : "Tremplin (+1)" */
+      9 : "Trappe (-1)",
+      10 : "Tremplin (+1)" */
     },
 
     calquesText : {
@@ -46,7 +48,7 @@ const app = () => {
     calquesGameDesign : {
     "Sortie" : [
         [0, 0, 0, 0, 0, 0, 0, 0, 0], // Ligne : Bordures
-        [0, 0, 0, 0, 0, 0, 0, 0, 0], // Ligne : Case
+        [0, 8, 0, 0, 0, 0, 0, 0, 0], // Ligne : Case
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0], // Ligne : Case
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -109,7 +111,8 @@ const app = () => {
     nbTry : null,
     joueurActif : null,
     roles : ['SPY', 'PRISONNER'],
-    spyBoard : false,
+    /* Changement dans le gameplay : les joueurs jouent en simultané */
+    spyBoard : true,
 
     modalRules : false,
     modalHistory : false,
@@ -126,6 +129,7 @@ const app = () => {
     exploreAllLayers : false,
 
     nbCycleBeforeMoveLaser : null,
+    reverse: false,
 
     // Interface PRISONNER
     positionAbsPlayer : null,
@@ -140,7 +144,7 @@ const app = () => {
     nbPiratage : 1,
     nbDeminage : 2,
 
-    immuneLaser : false,
+    // immuneLaser : false,
 
     history : [],
 
@@ -156,16 +160,95 @@ const app = () => {
         [0, 0, 0, 0, 0, 0, 0, 0, 0], // Ligne : Bordures
     ],
 
+    // Méthodes
+
+      handleKeydown(event) {
+        switch (event.key) {
+          case 'ArrowUp':
+            this.player(this.moves[0], '');
+            break;
+          case 'ArrowLeft':
+            this.player(this.moves[2], '');
+            break;
+          case 'ArrowRight':
+            this.player(this.moves[3], '');
+            break;
+          case 'ArrowDown':
+            this.player(this.moves[1], '');
+            break;
+          case 'w':
+            if (this.nbDeminage > 0){
+              this.reduce('nbDeminage');
+              this.player(this.moves[0], 'Deminage');
+            } else {
+              this.history(">>> Le prisonnier n'a plus Déminer (action spéciale)");
+            }
+            break;
+          case 'a':
+            if (this.nbDeminage > 0){
+              this.reduce('nbDeminage');
+              this.player(this.moves[2], 'Deminage');
+            } else {
+              this.history(">>> Le prisonnier n'a plus Déminer (action spéciale)");
+            }
+            break;
+          case 'd':
+            if (this.nbDeminage > 0){
+              this.reduce('nbDeminage');
+              this.player(this.moves[3], 'Deminage');
+            } else {
+              this.history(">>> Le prisonnier n'a plus Déminer (action spéciale)");
+            }
+            break;
+          case 's':
+            if (this.nbDeminage > 0){
+              this.reduce('nbDeminage');
+              this.player(this.moves[1], 'Deminage');
+            } else {
+              this.history(">>> Le prisonnier n'a plus Déminer (action spéciale)");
+            }
+            break;
+          case 'l':
+            if (this.nbDisjoncteur > 0 ) {
+              this.reduce('nbDisjoncteur') ;
+              this.player('', 'Disjoncter');
+            } else {
+              this.history(">>> Le prisonnier n'a plus Disjoncter (action spéciale)");
+            }
+            break;
+          case 'p':
+            if (this.nbPiratage > 0 ) {
+              this.reduce('nbPiratage') ; 
+              this.player('', 'Pirater');
+            } else {
+              this.history(">>> Le prisonnier n'a plus Pirater (action spéciale)");
+            }
+            break;
+        }
+    },
+
     init(){
+
+      window.addEventListener('keydown', this.handleKeydown.bind(this));
 
       this.nbCycle = 1 ;
       this.nbTry = 1 ;
-      this.joueurActif = this.roles[0];
-      this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
+      // this.joueurActif = this.roles[0];
+      // this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
 
       this.nbCycleBeforeMoveLaser = 4 ;
 
-      this.history("> Partie initialisée : Cycle n°1, essai n°1 et joueur actif : SPY");
+      // Lancer la partie
+      // Rappel du rôle puis de l'explication du rôle
+      this.history('=> Étendre la fenêtre du jeu sur 2 écrans avec le clavier d\'un côté et la souris de l\'autre');
+
+      this.rules();
+
+      this.history("=> Partie initialisée : Cycle n°1, essai n°1 et joueur actif : SPY");
+    },
+
+    rules(){
+      // rappel des règles avant la partie
     },
 
     wait(ms) {
@@ -178,7 +261,7 @@ const app = () => {
         await this.wait(800);
       }
 
-      this.history("> L'espion a eu un aperçu de la configuration du CUBE");
+      this.history("=> L'espion a eu un aperçu de la configuration du CUBE");
 
       this.isDisabled = true ;
     },
@@ -187,20 +270,16 @@ const app = () => {
       if (whom === this.roles[0]) {
         this.joueurActif = this.roles[0];
 
-        this.history("> L'espion a désormais la main");
+        this.history("- L'espion a désormais la main");
 
       } else {
         this.joueurActif = this.roles[1];
         this.displayGrid('PRISONNER', this.playerPosition, '.gridPrisonner', true);
 
-        this.immuneCamera = false ;
-        this.immuneLaser = false ;
-        this.immuneMine = false ;
-
-        this.history("> Le prisonnier a désormais la main");
+        this.history("- Le prisonnier a désormais la main");
 
       }
-      this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
+      // this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
       this.nbCycle++ ;
       this.nbCycleBeforeMoveLaser--;
 
@@ -208,27 +287,22 @@ const app = () => {
         this.moveLaser();
         let coordsPlayer = this.playerPos();
 
-        this.history("> Déplacement du laser");
+        this.history("- Déplacement du laser");
 
-        if (coordsPlayer[0]+1 === this.laserActuel && this.immuneLaser === false) {
-          alert('Le prisonnier a été rattrapé et grillé par le fil laser !');
-          this.history("> ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser");
+        if (coordsPlayer[0]+1 === this.laserActuel) {
+          this.history('- ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser !');
+          this.history("- ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser");
           this.nbTry++ ;
         }
       }
     },
 
     history(action){
-      var newAction = document.createElement('p');
-      newAction.textContent = action ;
-
-        // Sélectionner l'élément parent où insérer le paragraphe
-        var parent = document.querySelector('.scrollable-div');
-
-        if (parent) {
-          parent.appendChild(newAction);
-          parent.scrollTop = parent.scrollHeight - parent.clientHeight;
-        }
+      const elements = document.querySelectorAll('.scrollable-div');
+      elements.forEach(element => {
+        element.innerHTML += '<br>' + action ;
+        element.scrollTop = element.scrollHeight - element.clientHeight;
+      });
     },
 
     playerPos(){
@@ -281,10 +355,10 @@ const app = () => {
 
       switch(move){
         case 'TOP':
+          direction = 'le haut';
           if (coords[0] > 2) {
             coordX = -1;
             coordY = 0 ;
-            direction = 'le haut';
           } else {
             if (this.calqueActif === 'Sortie') {
               coordX = -1 ;
@@ -295,10 +369,10 @@ const app = () => {
           }
           break;
         case 'LEFT':
+          direction = 'la gauche';
           if (coords[1] > 2) {
             coordX = 0;
             coordY = -1;
-            direction = 'la gauche';
           } else {
             if (this.calqueActif === 'Sortie') {
               coordX = 0 ;
@@ -309,10 +383,10 @@ const app = () => {
           }
           break;
         case 'RIGHT':
+          direction = 'la droite';
           if (coords[1] < nbColumn-2) {
             coordX = 0;
             coordY = 1 ;
-            direction = 'la droite';
           } else {
             if (this.calqueActif === 'Sortie') {
               coordX = 0 ;
@@ -323,10 +397,10 @@ const app = () => {
           }
           break;
         case 'BOTTOM':
+          direction = 'le bas';
           if (coords[0] < nbRow-2) {
             coordX = 1 ;
             coordY = 0 ;
-            direction = 'le bas';
           } else {
             if (this.calqueActif === 'Sortie') {
               coordX = 1 ;
@@ -357,41 +431,40 @@ const app = () => {
       }
 
       if (this.calqueActif === 'Sortie' && this.calquesGameDesign['Sortie'][coords[0] + coordX][coords[1] + coordY] === 1) {
-        alert('VICTOIRE, vous réussi à vous échapper grâce à votre complice en ' + this.nbTry + ' essai(s) !');
-        this.history('> Victoire en ' + this.nbTry + ' essai(s) !');
+        this.history('- VICTOIRE, vous réussi à vous échapper grâce à votre complice en ' + this.nbTry + ' essai(s) !');
+        this.history('- Victoire en ' + this.nbTry + ' essai(s) !');
       } else if (this.calquesGameDesign['Bordures'][coords[0] + coordX][coords[1] + coordY] === 2) {
-        alert('ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez touché une bordure intérieure');
-        this.history('> ÉCHEC DE L\'ESSAI, vous avez touché une bordure intérieure');
+        this.history('- ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez touché une bordure intérieure');
+        this.history('- ÉCHEC DE L\'ESSAI, vous avez touché une bordure intérieure');
         this.nbTry++;
       } else if (this.calqueActif !== 'Mines' &&  this.calquesGameDesign['Mines'][coords[0] + coordX*2][coords[1] + coordY*2] === 4) {
-        alert('ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez déclenchez une mine');
-        this.history('> ÉCHEC DE L\'ESSAI, vous avez déclenchez une mine');
+        this.history('- ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez déclenchez une mine');
+        this.history('- ÉCHEC DE L\'ESSAI, vous avez déclenchez une mine');
         this.nbTry++;
         this.calquesGameDesign['Mines'][coords[0] + coordX*2][coords[1] + coordY*2] = 0 ;
       } else if (this.calqueActif !== 'Camera' &&  this.calquesGameDesign['Camera'][coords[0] + coordX*2][coords[1] + coordY*2] === 6) {
-        alert('ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous êtes entrer dans le champ de vision de la caméra!');
-        this.history('> ÉCHEC DE L\'ESSAI, vous êtes entrer dans le champ de vision de la caméra!');
+        this.history('- ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous êtes entrer dans le champ de vision de la caméra!');
+        this.history('- ÉCHEC DE L\'ESSAI, vous êtes entrer dans le champ de vision de la caméra!');
         this.nbTry++;
       } else if (move === '' && action === this.actions[2]){
         if (camSuccess) {
-          this.history('> La caméra a été coupée, son champ de vision est désormais nul !');
+          this.history('- La caméra a été coupée, son champ de vision est désormais nul !');
         } else {
-          this.history('> Le prisonnier a essayé de pirater la caméra de surveillance depuis une tuile qui ne le permettait pas !');
+          this.history('- Le prisonnier a essayé de pirater la caméra de surveillance depuis une tuile qui ne le permettait pas !');
         }
       } else {
         if (!immobile) {
           this.updateGrid(coords[0] + coordX*2, coords[1] + coordY*2);
-          this.history('> Le prisonnier s\'est déplacé vers ' + direction);
+          this.history('- Le prisonnier s\'est déplacé vers ' + direction);
         } else {
-
-          this.history('> Le prisonnier s\'est déplacé vers ' + direction);
+          this.history('- Le prisonnier ne s\'est pas déplacé.');
         }
         
       }
 
       if (borderError) {
-        alert('ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez touché une bordure extérieure');
-        this.history('> ÉCHEC DE L\'ESSAI, vous avez touché une bordure extérieure');
+        this.history('- ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez touché une bordure extérieure');
+        this.history('- ÉCHEC DE L\'ESSAI, vous avez touché une bordure extérieure');
         this.nbTry++;
       }
     },
@@ -409,7 +482,7 @@ const app = () => {
         case 'nbDisjoncteur':
           this.nbDisjoncteur-- ;
           this.history('>>> Disjoncter (action spéciale) a été utilisé par le prisonnier');
-          this.immuneLaser = true ;
+          this.nbCycleBeforeMoveLaser += 2 ;
           break;
       }
     },
@@ -423,12 +496,11 @@ const app = () => {
 
       // sens du Laser
       let decalage ;
-      let reverse = false ;
-      if (this.laserActuel === 8 || reverse === true) {
-        if (this.laserActuel === 8) reverse === true ;
+      if (this.laserActuel === 8 || this.reverse === true) {
+        if (this.laserActuel === 8) this.reverse === true ;
         decalage = -2 ;
       } else {
-        if (this.laserActuel === 0) reverse = false ;
+        if (this.laserActuel === 0) this.reverse = false ;
         decalage = 2 ;
       }
 
@@ -470,11 +542,11 @@ const app = () => {
           this.moveLaser();
           let coordsPlayer = this.playerPos();
 
-          this.history("> Déplacement du laser");
+          this.history("- Déplacement du laser");
 
-          if (coordsPlayer[0]+1 === this.laserActuel && this.immuneLaser === false) {
-            alert('Le prisonnier a été rattrapé et grillé par le fil laser !');
-            this.history("> ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser");
+          if (coordsPlayer[0]+1 === this.laserActuel) {
+            this.history('- Le prisonnier a été rattrapé et grillé par le fil laser !');
+            this.history("- ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser");
             this.nbTry++ ;
           }
         }
@@ -562,62 +634,5 @@ const app = () => {
         gridElement.appendChild(rowElement);
       }
     },
-
-
-        // Lancer la partie : rappel du niveau
-        // Rappel du rôle puis de l'explication du rôle
-
-        // Écran actif : SPY
-        // Montrer tous les calques
-
-        // Écran actif : PRISONNNER
-
   }
 }
-
-
-document.addEventListener("DOMContentLoaded", function() {
-
-  document.addEventListener('keydown', (event) => {
-    switch (event.key) {
-      case 'ArrowUp':
-        player(moves[0], '');
-        break;
-      case 'ArrowLeft':
-        player(moves[2], '');
-        break;
-      case 'ArrowRight':
-        player(moves[3], '');
-        break;
-      case 'ArrowDown':
-        player(moves[1], '');
-        break;
-      case 'w':
-        reduce('nbDeminage');
-        player(moves[0], 'Deminage');
-        break;
-      case 'a':
-        reduce('nbDeminage');
-        player(moves[2], 'Deminage');
-        break;
-      case 'd':
-        reduce('nbDeminage');
-        player(moves[3], 'Deminage');
-        break;
-      case 's':
-        reduce('nbDeminage');
-        player(moves[1], 'Deminage');
-        break;
-      case 'l':
-        reduce('nbDisjoncteur') ;
-        player('', 'Disjoncter');
-        break;
-      case 'p':
-        reduce('nbPiratage') ; 
-        player('', 'Pirater');
-        break;
-    }
-  });
-
-});
-
