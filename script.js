@@ -266,37 +266,6 @@ const app = () => {
       this.isDisabled = true ;
     },
 
-    giveHand(whom){
-      if (whom === this.roles[0]) {
-        this.joueurActif = this.roles[0];
-
-        this.history("- L'espion a désormais la main");
-
-      } else {
-        this.joueurActif = this.roles[1];
-        this.displayGrid('PRISONNER', this.playerPosition, '.gridPrisonner', true);
-
-        this.history("- Le prisonnier a désormais la main");
-
-      }
-      // this.joueurActif === 'SPY' ? this.spyBoard = true : this.spyBoard = false
-      this.nbCycle++ ;
-      this.nbCycleBeforeMoveLaser--;
-
-      if (this.nbCycleBeforeMoveLaser === 0){
-        this.moveLaser();
-        let coordsPlayer = this.playerPos();
-
-        this.history("- Déplacement du laser");
-
-        if (coordsPlayer[0]+1 === this.laserActuel) {
-          this.history('- ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser !');
-          this.history("- ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser");
-          this.nbTry++ ;
-        }
-      }
-    },
-
     history(action){
       const elements = document.querySelectorAll('.scrollable-div');
       elements.forEach(element => {
@@ -431,20 +400,18 @@ const app = () => {
       }
 
       if (this.calqueActif === 'Sortie' && this.calquesGameDesign['Sortie'][coords[0] + coordX][coords[1] + coordY] === 1) {
-        this.history('- VICTOIRE, vous réussi à vous échapper grâce à votre complice en ' + this.nbTry + ' essai(s) !');
-        this.history('- Victoire en ' + this.nbTry + ' essai(s) !');
+        this.history('- VICTOIRE, vous avez réussi à vous échapper grâce à votre complice en ' + this.nbTry + ' essai(s) !');
       } else if (this.calquesGameDesign['Bordures'][coords[0] + coordX][coords[1] + coordY] === 2) {
+        this.updateGrid(coords[0], coords[1]);
+        this.history('- Le prisonnier n\'a pas pu se déplacé vers ' + direction);
         this.history('- ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez touché une bordure intérieure');
-        this.history('- ÉCHEC DE L\'ESSAI, vous avez touché une bordure intérieure');
         this.nbTry++;
       } else if (this.calqueActif !== 'Mines' &&  this.calquesGameDesign['Mines'][coords[0] + coordX*2][coords[1] + coordY*2] === 4) {
         this.history('- ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez déclenchez une mine');
-        this.history('- ÉCHEC DE L\'ESSAI, vous avez déclenchez une mine');
         this.nbTry++;
         this.calquesGameDesign['Mines'][coords[0] + coordX*2][coords[1] + coordY*2] = 0 ;
       } else if (this.calqueActif !== 'Camera' &&  this.calquesGameDesign['Camera'][coords[0] + coordX*2][coords[1] + coordY*2] === 6) {
         this.history('- ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous êtes entrer dans le champ de vision de la caméra!');
-        this.history('- ÉCHEC DE L\'ESSAI, vous êtes entrer dans le champ de vision de la caméra!');
         this.nbTry++;
       } else if (move === '' && action === this.actions[2]){
         if (camSuccess) {
@@ -464,7 +431,6 @@ const app = () => {
 
       if (borderError) {
         this.history('- ÉCHEC DE L\'ESSAI de cette tentative d\'évasion, vous avez touché une bordure extérieure');
-        this.history('- ÉCHEC DE L\'ESSAI, vous avez touché une bordure extérieure');
         this.nbTry++;
       }
     },
@@ -545,7 +511,6 @@ const app = () => {
           this.history("- Déplacement du laser");
 
           if (coordsPlayer[0]+1 === this.laserActuel) {
-            this.history('- Le prisonnier a été rattrapé et grillé par le fil laser !');
             this.history("- ÉCHEC DE L\'ESSAI : Le prisonnier a été rattrapé et grillé par le fil laser");
             this.nbTry++ ;
           }
